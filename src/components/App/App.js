@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 
+import { getTools } from "../../services/api";
+
 import SearchBar from "../SearchBar/SearchBar";
 import ToolsList from "../ToolsList/ToolsList";
 
@@ -8,24 +10,13 @@ function App() {
   let [query, setQuery] = useState("");
   let [tagsOnly, setTagsOnly] = useState(false);
 
-  useEffect(
-    function getTools() {
-      const baseURL = "http://localhost:3000/tools";
-      const globalQueryParam = "?q=";
-      const tagsParam = "?tags_like=";
-      const url = query
-        ? baseURL + (!tagsOnly ? globalQueryParam : tagsParam) + query
-        : baseURL;
-
-      fetch(url).then(async function (res) {
-        const data = await res.json();
-        console.log(data);
-
-        setTools(data);
-      });
-    },
-    [query, tagsOnly]
-  );
+  useEffect(() => {
+    try {
+      getTools({ query, tagsOnly }).then((data) => setTools(data));
+    } catch (err) {
+      console.log(err);
+    }
+  }, [query, tagsOnly]);
 
   function handleToolsQuery(e) {
     e.preventDefault();
